@@ -1,0 +1,131 @@
+THIS IS THE CODE FOR MY PROJECT:-
+
+import tkinter as tk
+from tkinter import ttk
+
+# storing all exercise info here (can expand later)
+# NOTE: keeping things simple for now
+workout_data = { "Chest": [("Bench Press", " "),
+        ("Incline Dumbbell Press", " "),
+        ("Chest Fly", " ")],
+    "Back": [("Pull Ups", " "),
+        ("Lat Pulldown", " "),
+        ("Seated Row", " ")],
+    "Shoulders": [("Overhead Press", " "),
+        ("Lateral Raise", " "),
+        ("Front Raise", " ")],
+    "Arms": [("Bicep Curls", " "),
+        ("Tricep Pushdowns", " "),
+        ("Hammer Curls", " ")],
+    "Legs": [("Squats", " "),
+        ("Leg Press", " "),
+        ("Lunges", " ")],
+    "Abs": [("Crunches", " "),
+        ("Plank", " "),
+        ("Leg Raises", " ")]}
+
+class GymGuideApp:
+    # building the GUI here with a more colorful/fancy look
+    def __init__(self, window):
+        self.win = window
+        self.win.title("Gym Workout Guide")
+
+        # slightly bigger window for visuals
+        self.win.geometry("560x460")
+        self.win.resizable(False, False)
+
+        # soft gradient-like background using a simple color tone
+        self.win.config(bg="#e7d9ff")    # light lavender/purple tone
+
+        self.build_ui()
+
+    def build_ui(self):
+        # heading (kept minimal but stylish)
+        header = tk.Label( self.win,
+            text="🏋️ Workout Guide",
+            font=("Segoe UI", 20, "bold"),
+            fg="#4b2e83",                # darker purple
+            bg="#e7d9ff" )
+        header.pack(pady=15)
+
+        # frame for dropdown (white card-like UI)
+        top_frame = tk.Frame(self.win,
+            bg="white",
+            bd=2,
+            relief="ridge",
+            highlightbackground="#c9b3ff",
+            highlightthickness=2)
+        top_frame.pack(pady=12)
+
+        tk.Label( top_frame,
+            text="Choose muscle group:",
+            font=("Segoe UI", 12),
+            bg="white",
+            fg="#4b2e83" ).grid(row=0, column=0, padx=12, pady=12)
+
+        # combobox with custom styling
+        self.group_box = ttk.Combobox(
+            top_frame,
+            values=list(workout_data.keys()),
+            width=22,
+            font=("Segoe UI", 11))
+        self.group_box.grid(row=0, column=1, padx=10)
+        self.group_box.bind("<<ComboboxSelected>>", self.populate_exercises)
+
+        # listbox container (card look)
+        list_frame = tk.Frame(self.win,
+            bg="white",
+            bd=2,
+            relief="ridge",
+            highlightbackground="#c9b3ff",
+            highlightthickness=2)
+        list_frame.pack(pady=10)
+
+        # listbox with soft accent colors
+        self.exercise_list = tk.Listbox( list_frame,
+            font=("Segoe UI", 11),
+            width=42,
+            height=8,
+            bg="#faf7ff",
+            fg="#3c2c63",
+            selectbackground="#d6c6ff",
+            selectforeground="black",
+            bd=0,
+            highlightthickness=0)
+        self.exercise_list.pack(padx=10, pady=10)
+        self.exercise_list.bind("<<ListboxSelect>>", self.show_info)
+
+        # bottom info panel (white box)
+        self.info_panel = tk.Label(self.win,
+            text="Select an exercise to view instructions.",
+            font=("Segoe UI", 12),
+            bg="#e7d9ff",
+            fg="#4b2e83",
+            justify="left" )
+        self.info_panel.pack(pady=10)
+
+    def populate_exercises(self, event):
+        self.exercise_list.delete(0, tk.END)
+
+        chosen_group = self.group_box.get()
+        items = workout_data.get(chosen_group, [])
+
+        for name, _ in items:
+            self.exercise_list.insert(tk.END, name)
+
+        self.info_panel.config(text="Select an exercise to view instructions.")
+
+    def show_info(self, event):
+        chosen_group = self.group_box.get()
+        selection = self.exercise_list.curselection()
+        if not selection: return
+        idx = selection[0]
+        ex_name, ex_detail = workout_data[chosen_group][idx]
+
+        # update bottom info area
+        self.info_panel.config(text=f"📌 {ex_name}\n\n{ex_detail}")
+
+# start the app
+root = tk.Tk()
+GymGuideApp(root)
+root.mainloop()
